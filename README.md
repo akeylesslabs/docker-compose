@@ -11,6 +11,21 @@ Refer to Akeyless docs for full details: https://docs.akeyless.io/docs
 
 ## Prerequisites
 
+### Intended use & production guidance
+What this stack is for? 
+- Evaluate Akeyless Gateway and SRA quickly on a single host
+- Demo/POC workflows (API, Web SRA, SSH proxy)
+- Small pilots with limited users/targets where downtime is acceptable
+
+### Why not production
+- Docker Compose on a single machine lacks production guarantees:
+- No HA or failover: single host, single Redis instance, no rolling upgrades
+- Scaling limits: manual scale-out, no pod autoscaling or placement policies
+- Security hardening gaps: env files, local volumes, broad port exposure, weaker network policy
+- Ops ergonomics: limited upgrade/rollback strategy, backup/restore, and automated alerts
+
+### For production, use Kubernetes + Helm
+
 - Docker and Docker Compose v2+
 - Access to Akeyless with appropriate permissions
 - Values set in `gateway.env` and `sra.env`
