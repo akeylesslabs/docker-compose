@@ -131,7 +131,7 @@ services:
       - gateway
       - sra
     container_name: "redis-cache"
-    image: bitnami/redis:latest  # Use latest Redis image
+    image: 8.2.1-alpine  # Use  alpine based REDIS image
     command: ["sh", "-c", "redis-server --requirepass $REDIS_PASS --save '' --appendonly 'no'"] 
     env_file:
       - gateway.env
@@ -155,7 +155,7 @@ services:
     profiles:
       - metrics
     container_name: "prometheus"
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.5.0
     restart: unless-stopped
     ports:
       - "9090:9090"
