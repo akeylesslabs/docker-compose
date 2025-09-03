@@ -49,9 +49,21 @@ services:
     links:
       - "redis-cache"
     volumes:
-      - ./metrics/otel-config.yaml:/akeyless/otel-config.yaml  # metrics config yaml if metrics is enabled
-      - ./GW_TLS/ca.crt:/home/akeyless/.akeyless/akeyless-api-cert.crt
-      - ./GW_TLS/key.pem:/home/akeyless/.akeyless/akeyless-api-cert.key
+     # --- Metrics / OpenTelemetry (OPTIONAL) ---
+      # Put your own OTEL config on the host and mount it into the container.
+      # Replace <path-to-your-otel-config.yaml> with your actual file path.
+      # Example: ./metrics/otel-config.yaml:/akeyless/otel-config.yaml
+      - <path-to-your-otel-config.yaml>:/akeyless/otel-config.yaml:ro
+
+      # --- TLS for Gateway Config Manager / local API (OPTIONAL) ---
+      # Provide YOUR OWN certificate and key (PEM-encoded) from the host.
+      # Replace the placeholders below with your real file paths.
+      # If you’re not enabling TLS, comment these two lines out.
+      # Example crt: ./GW_TLS/ca.crt
+      # Example key: ./GW_TLS/key.pem
+      - <path-to-your-ca.crt>:/home/akeyless/.akeyless/akeyless-api-cert.crt:ro
+      - <path-to-your-key.pem>:/home/akeyless/.akeyless/akeyless-api-cert.key:ro
+      
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -112,9 +124,20 @@ services:
     environment:
       DEBUG: true
     volumes:
-      # To mount your ca.pub file to /var/akeyless/creds path, provide a local directory (For example: "ssh-config") which contains your ca.pub
-      #      - /path/to/your/ca/directory:/var/akeyless/creds  # optional
-      - ./ssh-config/:/var/akeyless/creds/
+      # --- SSH Certificate Authority public key (for SSH cert-based access) ---
+      # Mount a FOLDER that contains your SSH CA public key named **ca.pub**.
+      #
+      # What to do:
+      # 1) Put your CA public key file (ca.pub) in a folder on your host.
+      #    Example host layout:
+      #      ./ssh-config/
+      #        └── ca.pub                # <-- your SSH CA public key (PUBLIC key only)
+      # 2) Replace <path-to-folder-with-ca.pub> below with that folder path.
+      #
+      # Example (relative path):
+      # - ./ssh-config:/var/akeyless/creds:ro
+      - <path-to-folder-with-ca.pub>:/var/akeyless/creds:ro
+
     platform: linux/amd64
     links:
       - "redis-cache"
@@ -131,7 +154,7 @@ services:
       - gateway
       - sra
     container_name: "redis-cache"
-    image: 8.2.1-alpine  # Use  alpine based REDIS image
+    image: redis:8.2.1-alpine  # Use  alpine based REDIS image
     command: ["sh", "-c", "redis-server --requirepass $REDIS_PASS --save '' --appendonly 'no'"] 
     env_file:
       - gateway.env
@@ -160,8 +183,16 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      # --- REQUIRED: Your Prometheus config ---
+      # Put YOUR prometheus.yml on the host and mount it
+      # Edit it to scrape your services (akeyless-gateway, akeyless-sra-*, redis, etc.).
+      # Example host path: ./metrics/prometheus/prometheus.yml
+      - ./metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+      # --- PERSISTENCE: Prometheus TSDB data ---
+      # Keeps time-series data across container restarts/recreates.
       - prometheus_data:/prometheus
+
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
@@ -175,9 +206,19 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      # --- PERSISTENCE: Grafana state ---
+      # Stores dashboards saved via the UI, users, plugins, etc.
       - grafana_data:/var/lib/grafana
-      #- ./metrics/grafana-provisioning/data:/var/lib/grafana
-      #- ./metrics/grafana-provisioning/datasources:/etc/grafana/provisioning/datasources
+
+      # --- OPTIONAL: Pre-provision dashboards ---
+      # Put YOUR dashboard JSON files under the host folder below.
+      # Replace the path if you keep them somewhere else.
+      # - ./metrics/grafana-provisioning/dashboards:/etc/grafana/provisioning/dashboards
+
+      # --- OPTIONAL: Pre-provision data sources (e.g., Prometheus) ---
+      # Place YAML files defining datasources (point Prometheus URL to http://prometheus:9090).
+      # - ./metrics/grafana-provisioning/datasources:/etc/grafana/provisioning/datasources
+
     networks:
       - internal-metrics
 
@@ -192,5 +233,5 @@ networks:
     driver: bridge
 
 volumes:
-  grafana_data:
-  prometheus_data:
+  grafana_data:     # Named volume: persists Grafana state across restarts
+  prometheus_data:  # Named volume: persists Prometheus TSDB data
