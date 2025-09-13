@@ -32,6 +32,15 @@ What this stack is for?
 - For TLS-enabled Gateway config manager, provide the cert and key at:
   - `GW_TLS/ca.crt`
   - `GW_TLS/key.pem`
+ 
+### Redis password (required when cache is enabled)
+If you enable the Gateway cluster cache, you **must** define a Redis password. Create or edit a `.env` file in this folder and set:
+
+`REDIS_PASS='your-REDIS-password'`
+
+> The password is stored in the local `.env` file and is referenced by both the `redis-cache` service and the Gateway (`gateway.env`).
+> Replace the example value with your own and keep this file out of source control.
+
 
 ## Profiles and Services
 
@@ -61,7 +70,15 @@ Edit `gateway.env` and `sra.env` and set your values:
 - `CLUSTER_NAME`: your gateway name
 - `UNIFIED_GATEWAY`: typically `true`
 - `ENABLE_METRICS`: `true` to expose metrics on 8889
-- Redis cache (recommended): `REDIS_PASS`, `REDIS_ADDR`, `GATEWAY_CLUSTER_CACHE="enable"`, `USE_CLUSTER_CACHE=true`
+
+- Redis cache (recommended):
+  - Define `REDIS_PASS` in the repository `.env` file (e.g., `REDIS_PASS='your-REDIS-password'`).
+  - In `gateway.env`, set:
+    - `USE_CLUSTER_CACHE=true`
+    - `GATEWAY_CLUSTER_CACHE="enable"`
+    - `REDIS_ADDR=redis-cache:6379`
+    - `REDIS_PASS=${REDIS_PASS}`  ← references the value from `.env`
+
 - SRA integration (if using `sra` profile):
   - `REMOTE_ACCESS_WEB_SERVICE_INTERNAL_URL="http://akeyless-web:8888"`
   - `REMOTE_ACCESS_SSH_SERVICE_INTERNAL_URL="http://akeyless-ssh:9900"`
@@ -171,3 +188,4 @@ docker compose down && docker compose --profile gateway --profile sra up -d --fo
 - Replace any default/example passwords
 - Limit exposed ports as needed
 - Consider running with a non-root user on the host when starting compose (e.g., `CURRENT_UID=$(id -u):$(id -g) docker compose up`)
+- **Store the Redis password in `.env` and keep it out of source control** (e.g., ensure `.env` is in `.gitignore`). Prefer Docker/K8s secrets for production.
