@@ -48,12 +48,12 @@ services:
     platform: linux/amd64
     links:
       - "redis-cache"
-    volumes:
+    # volumes:
      # --- Metrics / OpenTelemetry (OPTIONAL) ---
       # Put your own OTEL config on the host and mount it into the container.
       # Replace <path-to-your-otel-config.yaml> with your actual file path.
       # Example: ./metrics/otel-config.yaml:/akeyless/otel-config.yaml
-      - <path-to-your-otel-config.yaml>:/akeyless/otel-config.yaml:ro
+      # - ./metrics/otel-config.yaml:/akeyless/otel-config.yaml:ro
 
       # --- TLS for Gateway Config Manager / local API (OPTIONAL) ---
       # Provide YOUR OWN certificate and key (PEM-encoded) from the host.
@@ -61,8 +61,9 @@ services:
       # If you’re not enabling TLS, comment these two lines out.
       # Example crt: ./GW_TLS/ca.crt
       # Example key: ./GW_TLS/key.pem
-      - <path-to-your-ca.crt>:/home/akeyless/.akeyless/akeyless-api-cert.crt:ro
-      - <path-to-your-key.pem>:/home/akeyless/.akeyless/akeyless-api-cert.key:ro
+      # - <path-to-your-ca.crt>:/home/akeyless/.akeyless/akeyless-api-cert.crt:ro
+      # - <path-to-your-key.pem>:/home/akeyless/.akeyless/akeyless-api-cert.key:ro
+      
       
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -136,7 +137,7 @@ services:
       #
       # Example (relative path):
       # - ./ssh-config:/var/akeyless/creds:ro
-      - <path-to-folder-with-ca.pub>:/var/akeyless/creds:ro
+      - ./ssh-config/ca.pub/ca.pub:/etc/ssh/ca.pub:ro   # <-- new
 
     platform: linux/amd64
     links:
@@ -222,9 +223,9 @@ services:
     networks:
       - internal-metrics
 
-secrets:
-  redis_password:
-    file: ./secrets/redis_password
+#secrets:
+#  redis_password:
+#    file: ./secrets/redis_password
 
 networks:
   internal-net:
