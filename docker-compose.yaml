@@ -3,7 +3,7 @@
 #This Compose file contains examples of Akeyless services:
 #  - akeyless-gateway
 #  - akeyless-web and akeyless-ssh (SRA)
-#  - redis-cache (for caching, optional)
+#  - akeyless-cache (for caching, optional)
 #  - prometheus and grafana (for metrics, optional)
 
 # Docker Compose supports the 'profiles' key to conditionally include services.
@@ -32,7 +32,7 @@ services:
       - gateway
       - sra
     depends_on:
-      redis-cache:
+      akeyless-cache:
         condition: service_started
     image: akeyless/base:latest-akeyless
     container_name: 'akeyless-gateway'
@@ -47,7 +47,7 @@ services:
       REDIS_PASS: ${REDIS_PASS}
     platform: linux/amd64
     links:
-      - "redis-cache"
+      - "akeyless-cache"
     # volumes:
      # --- Metrics / OpenTelemetry (OPTIONAL) ---
       # Put your own OTEL config on the host and mount it into the container.
@@ -83,7 +83,7 @@ services:
     profiles:
       - sra
     depends_on:
-      redis-cache:
+      akeyless-cache:
         condition: service_started
       akeyless-gateway:
         condition: service_healthy
@@ -100,7 +100,7 @@ services:
       DEBUG: true
     platform: linux/amd64
     links:
-      - "redis-cache"
+      - "akeyless-cache"
     networks:
       - internal-net
 
@@ -108,7 +108,7 @@ services:
     profiles:
       - sra
     depends_on:
-      redis-cache:
+      akeyless-cache:
         condition: service_started
       akeyless-gateway:
         condition: service_healthy
@@ -141,7 +141,7 @@ services:
 
     platform: linux/amd64
     links:
-      - "redis-cache"
+      - "akeyless-cache"
     networks:
       - internal-net
 
@@ -150,11 +150,11 @@ services:
   ## Enable redis docker to enable cache
   ## We highly recommend to run this as a non root user: CURRENT_UID=$(id -u):$(id -g) docker-compose up
   ## Example - CURRENT_UID=1001:1001 docker-compose up
-  redis-cache:
+  akeyless-cache:
     profiles:
       - gateway
       - sra
-    container_name: "redis-cache"
+    container_name: "akeyless-cache"
     image: redis:8.2.1-alpine  # Use  alpine based REDIS image
     command: ["sh", "-c", "redis-server --requirepass $REDIS_PASS --save '' --appendonly 'no'"] 
     env_file:
