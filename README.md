@@ -4,7 +4,7 @@ This folder provides an example Docker Compose setup for running:
 
 - Akeyless Gateway
 - Secure Remote Access (SRA): web and SSH components
-- Optional: Redis cache
+- Optional: Akeyless cache
 - Optional: Prometheus and Grafana for metrics
 
 Refer to Akeyless docs for full details: https://docs.akeyless.io/docs
@@ -48,11 +48,11 @@ This compose file uses profiles so you can start only what you need:
 
 - `gateway`:
   - `akeyless-gateway` (ports 8000, 8080, 8889)
-  - `redis-cache` (localhost:6379)
+  - `akeyless-cache` (localhost:6379)
 - `sra`:
   - `akeyless-web` (port 8888)
   - `akeyless-ssh` (ports 2222, 9900)
-  - `redis-cache`
+  - `akeyless-cache`
 - `metrics`:
   - `prometheus` (port 9090)
   - `grafana` (port 3000)
@@ -76,7 +76,7 @@ Edit `gateway.env` and `sra.env` and set your values:
   - In `gateway.env`, set:
     - `USE_CLUSTER_CACHE=true`
     - `GATEWAY_CLUSTER_CACHE="enable"`
-    - `REDIS_ADDR=redis-cache:6379`
+    - `REDIS_ADDR=akeyless-cache:6379`
     - `REDIS_PASS=${REDIS_PASS}`  ← references the value from `.env`
 
 - SRA integration (if using `sra` profile):
