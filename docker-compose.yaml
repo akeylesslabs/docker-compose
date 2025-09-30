@@ -124,7 +124,11 @@ services:
       - gateway.env
     environment:
       DEBUG: true
-    volumes:
+  # ------------------------------------------------------------------------------------------#
+  # SSH Volume                                                                                #
+  # Enable SSH volumes section and configure the path to the ca.pub only if SRA is configured #
+  # ------------------------------------------------------------------------------------------#
+    #volumes:
       # --- SSH Certificate Authority public key (for SSH cert-based access) ---
       # Mount a FOLDER that contains your SSH CA public key named **ca.pub**.
       #
@@ -136,9 +140,8 @@ services:
       # 2) Replace <path-to-folder-with-ca.pub> below with that folder path.
       #
       # Example (relative path):
-      # - ./ssh-config:/var/akeyless/creds:ro
-      - ./ssh-config/ca.pub/ca.pub:/etc/ssh/ca.pub:ro   # <-- new
-
+      # - ./home/ca.pub:/var/akeyless/creds/ca.pub --> Define the relative location of the ca.pub file
+      
     platform: linux/amd64
     links:
       - "akeyless-cache"
