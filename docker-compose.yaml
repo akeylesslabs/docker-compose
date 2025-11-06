@@ -123,6 +123,7 @@ services:
       - sra.env
       - gateway.env
     environment:
+      REDIS_PASS: ${REDIS_PASS}
       DEBUG: true
   # ------------------------------------------------------------------------------------------#
   # SSH Volume                                                                                #
