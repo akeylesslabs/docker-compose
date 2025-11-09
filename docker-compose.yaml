@@ -43,8 +43,7 @@ services:
       - "8889:8889"   # only if Metrics profile is enabled
     env_file:
       - gateway.env
-    environment:
-      REDIS_PASS: ${REDIS_PASS}
+      - cache.env
     platform: linux/amd64
     links:
       - "akeyless-cache"
@@ -122,6 +121,7 @@ services:
     env_file:
       - sra.env
       - gateway.env
+      - cache.env
     environment:
       DEBUG: true
   # ------------------------------------------------------------------------------------------#
@@ -159,11 +159,11 @@ services:
       - sra
     container_name: "akeyless-cache"
     image: redis:8.2.2-alpine  # Use  alpine based REDIS image
-    command: ["sh", "-c", "redis-server --requirepass $REDIS_PASS --save '' --appendonly 'no'"] 
+    # entrypoint: ["redis-server"]
+    command: ["--requirepass", "${REDIS_PASS}", "--save", "", "--appendonly", "no"] 
     env_file:
       - gateway.env
-   #secrets:
-   #  - redis_password
+      - cache.env
     networks:
       - internal-net  # Restrict access to other containers
     security_opt:
@@ -226,9 +226,6 @@ services:
     networks:
       - internal-metrics
 
-#secrets:
-#  redis_password:
-#    file: ./secrets/redis_password
 
 networks:
   internal-net:
