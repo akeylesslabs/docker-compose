@@ -34,11 +34,11 @@ What this stack is for?
   - `GW_TLS/key.pem`
  
 ### Redis password (required when cache is enabled)
-If you enable the Gateway cluster cache, you **must** define a Redis password. Create or edit a `.env` file in this folder and set:
+If you enable the Gateway cluster cache, you **must** define a Redis password. Edit the cache.env file in this folder and set:
 
 `REDIS_PASS='your-REDIS-password'`
 
-> The password is stored in the local `.env` file and is referenced by both the `redis-cache` service and the Gateway (`gateway.env`).
+> The password is stored in the Cache.env file and is referenced by both the `redis-cache` service and the Gateway (`gateway.env`).
 > Replace the example value with your own and keep this file out of source control.
 
 
@@ -72,12 +72,11 @@ Edit `gateway.env` and `sra.env` and set your values:
 - `ENABLE_METRICS`: `true` to expose metrics on 8889
 
 - Redis cache (recommended):
-  - Define `REDIS_PASS` in the repository `.env` file (e.g., `REDIS_PASS='your-REDIS-password'`).
+  - Define `REDIS_PASS` in the repository cache.env file (e.g., `REDIS_PASS='your-REDIS-password'`).
   - In `gateway.env`, set:
     - `USE_CLUSTER_CACHE=true`
     - `GATEWAY_CLUSTER_CACHE="enable"`
     - `REDIS_ADDR=akeyless-cache:6379`
-    - `REDIS_PASS=${REDIS_PASS}`  ← references the value from `.env`
 
 - SRA integration (if using `sra` profile):
   - `REMOTE_ACCESS_WEB_SERVICE_INTERNAL_URL="http://akeyless-web:8888"`
@@ -91,7 +90,7 @@ Edit `gateway.env` and `sra.env` and set your values:
   - `GATEWAY_URL=http://akeyless-gateway:8000`
   - `INTERNAL_GATEWAY_API=http://akeyless-gateway:8080`
 
-Note: This repository ships example defaults (including `REDIS_PASS="strong_password"`). Replace for production use.
+Note: This repository ships example defaults (including `REDIS_PASS="password"`). Replace for production use.
 
 ## Start the stack
 
