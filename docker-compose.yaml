@@ -94,6 +94,7 @@ services:
     env_file:
       - sra.env
       - gateway.env
+      - cache.env        
     environment:
       REMOTE_ACCESS_TYPE: "web"
       DEBUG: true
@@ -159,8 +160,7 @@ services:
       - sra
     container_name: "akeyless-cache"
     image: redis:8.2.2-alpine  # Use  alpine based REDIS image
-    # entrypoint: ["redis-server"]
-    command: ["--requirepass", "${REDIS_PASS}", "--save", "", "--appendonly", "no"] 
+    command: /bin/sh -c "redis-server --requirepass \"$$REDIS_PASS\" --appendonly no --save ''"
     env_file:
       - gateway.env
       - cache.env
@@ -174,8 +174,9 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:6379:6379"
-      #volumes:
-      #- ./redis-acl.conf:/opt/bitnami/redis/etc/redis.conf:ro
+    # volumes:
+    #   - redis:/data
+    #   - ./redis-acl.conf:/opt/bitnami/redis/etc/redis.conf:ro
 
 
   prometheus:
