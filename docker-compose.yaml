@@ -37,6 +37,11 @@ services:
     image: akeyless/base:latest-akeyless
     container_name: 'akeyless-gateway'
     restart: always
+    user: "1001:1001"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     ports:
       - "8000:8000"
       - "8080:8080"
@@ -45,6 +50,8 @@ services:
       - gateway.env
       - cache.env
     platform: linux/amd64
+    mem_limit: 4g
+    cpus: "2"
     links:
       - "akeyless-cache"
     # volumes:
@@ -89,6 +96,13 @@ services:
     image: akeyless/zero-trust-bastion:latest
     container_name: 'akeyless-sra-web'
     restart: always
+    user: "1001:1001"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 4g
+    cpus: "2"
     ports:
       - "8888:8888"
     env_file:
@@ -113,7 +127,20 @@ services:
       akeyless-gateway:
         condition: service_healthy
     image: akeyless/zero-trust-bastion:latest
-    privileged: true 
+    # Phase A hardening: narrow capabilities (no privileged)
+    # Still runs as root - documented exception required for Kyverno
+    # Phase B (separate epic) will refactor to non-root
+    cap_add:
+      - SYS_ADMIN      # Required for mount --bind /dev/pts
+      - MKNOD          # Required for mknod device nodes in jail
+      - DAC_OVERRIDE   # Required for adduser/deluser/jail permissions
+      - CHOWN          # Required by adduser + chroot setup
+      - SETUID         # Required by adduser + chroot setup
+      - SETGID         # Required by adduser + chroot setup
+      - FOWNER         # Required by adduser + chroot setup
+    security_opt:
+      # allowPrivilegeEscalation must be true for mount --bind to work
+      - no-new-privileges:false
     container_name: 'akeyless-sra-ssh'
     restart: always
     ports:
