@@ -9,6 +9,15 @@ This folder provides an example Docker Compose setup for running:
 
 Refer to Akeyless docs for full details: https://docs.akeyless.io/docs
 
+## Architecture support
+
+The Akeyless Gateway and SRA (`zero-trust-bastion`) images are published as
+multi-arch manifests (`linux/amd64` and `linux/arm64`). This Compose file sets no
+`platform:` pin, so Docker automatically pulls the image variant matching the
+host — run it unchanged on x86_64 or on arm64 hosts (AWS Graviton, Apple silicon).
+To force a specific variant, set `DOCKER_DEFAULT_PLATFORM=linux/amd64` (or
+`linux/arm64`) in your environment.
+
 ## Prerequisites
 
 ### Intended use & production guidance
