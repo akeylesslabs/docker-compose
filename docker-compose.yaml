@@ -44,7 +44,6 @@ services:
     env_file:
       - gateway.env
       - cache.env
-    platform: linux/amd64
     links:
       - "akeyless-cache"
     # volumes:
@@ -98,7 +97,6 @@ services:
     environment:
       REMOTE_ACCESS_TYPE: "web"
       DEBUG: true
-    platform: linux/amd64
     links:
       - "akeyless-cache"
     networks:
@@ -143,7 +141,6 @@ services:
       # Example (relative path):
       # - ./home/ca.pub:/var/akeyless/creds/ca.pub --> Define the relative location of the ca.pub file
       
-    platform: linux/amd64
     links:
       - "akeyless-cache"
     networks:
