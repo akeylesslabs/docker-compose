@@ -159,7 +159,7 @@ services:
       - gateway
       - sra
     container_name: "akeyless-cache"
-    image: redis:8.2.2-alpine  # Use  alpine based REDIS image
+    image: akeyless/redis:8.10.2-alpine3.23-akl.1  # Akeyless-built Redis (akeylesslabs/hardened-redis): scanned, signed, non-root
     command: /bin/sh -c "redis-server --requirepass \"$$REDIS_PASS\" --appendonly no --save ''"
     env_file:
       - gateway.env
