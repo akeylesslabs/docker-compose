@@ -183,7 +183,7 @@ services:
     profiles:
       - metrics
     container_name: "prometheus"
-    image: prom/prometheus:v3.5.0
+    image: prom/prometheus:v3.16.0
     restart: unless-stopped
     ports:
       - "9090:9090"
