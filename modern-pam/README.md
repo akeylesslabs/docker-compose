@@ -20,8 +20,10 @@ route, so a gateway serves the V1 bastion or the Modern PAM one and not both. Do
 ## Set it up
 
 1. Edit `gateway.env` and `sra.env` and replace every `XXXXXX`.
-2. Create the bastion's host key, once. It must stay the same across restarts:
-   `ssh-keygen -t rsa -b 2048 -m PEM -f ./hostkey -N '' -q && chmod 644 ./hostkey`
+2. Create the bastion's host key, once. It must stay the same across restarts. The bastion runs as user and group
+   65532 and the file is private to it, so no other account on the host can read the key:
+   `ssh-keygen -t rsa -b 2048 -m PEM -f ./hostkey -N '' -q && sudo chown 65532:65532 ./hostkey && chmod 600 ./hostkey`
+   If the bastion log says it cannot read the host key, check that the file's owner is `65532`.
 3. Put your targets' host keys in `./known_hosts`, one line each. A target that is not listed is refused.
 4. Start it with a published `akeyless/modern-pam` tag:
    `MODERN_PAM_VERSION=<tag> docker compose up -d`
