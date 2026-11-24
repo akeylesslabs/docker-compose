@@ -1,0 +1,65 @@
+# Akeyless Gateway with Modern PAM (SRA V2) on one host, for evaluation. Three services:
+# the gateway, the Modern PAM bastion and the remote desktop engine it drives. It is a separate
+# stack from the V1 files in the folder above, because a gateway sends session setup to one
+# bastion address per route, so a gateway serves the V1 bastion or the V2 one and not both.
+# Do not run it beside the V1 stack on the same gateway.
+#
+#   MODERN_PAM_VERSION=<published tag> docker compose up -d
+name: modern-pam
+
+services:
+  akeyless-gateway:
+    image: akeyless/gateway:${GATEWAY_VERSION:-latest}
+    container_name: akeyless-gateway
+    restart: unless-stopped
+    env_file:
+      - gateway.env
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    networks: [modern-pam]
+
+  modern-pam:
+    image: akeyless/modern-pam:${MODERN_PAM_VERSION:?set MODERN_PAM_VERSION to a published akeyless/modern-pam tag}
+    container_name: modern-pam
+    restart: unless-stopped
+    env_file:
+      - sra.env
+    volumes:
+      # A stable SSH host key, so clients keep their known_hosts across restarts and upgrades.
+      - ./hostkey:/etc/sra/hostkey:ro
+      # One line per SSH target host key. A target that is not listed is refused.
+      - ./known_hosts:/etc/sra/known_hosts:ro
+    ports:
+      - "2222:2222"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    depends_on:
+      akeyless-gateway:
+        condition: service_healthy
+      guacd:
+        condition: service_started
+    networks: [modern-pam]
+
+  guacd:
+    image: guacamole/guacd:1.6.0@sha256:8974eaa9ba32f713daf311e7cc8cd7e4cdfba1edea39eed75524e78ef4b08f4f
+    container_name: modern-pam-guacd
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 1g
+    pids_limit: 256
+    networks: [modern-pam]
+
+networks:
+  modern-pam: {}
