@@ -9,7 +9,7 @@ This folder provides an example Docker Compose setup for running:
 
 Refer to Akeyless docs for full details: https://docs.akeyless.io/docs
 
-**Modern PAM (SRA V2, public beta):** a separate stack with its own gateway is in [`modern-pam/`](modern-pam/). A gateway serves the V1 bastion below or the Modern PAM one, not both.
+**Modern PAM (public beta):** a separate stack with its own gateway is in [`modern-pam/`](modern-pam/). A gateway serves the V1 bastion below or the Modern PAM one, not both.
 
 ## Prerequisites
 

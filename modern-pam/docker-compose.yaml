@@ -1,4 +1,4 @@
-# Akeyless Gateway with Modern PAM (SRA V2) on one host, for evaluation. Three services:
+# Akeyless Gateway with Modern PAM on one host, for evaluation. Three services:
 # the gateway, the Modern PAM bastion and the remote desktop engine it drives. It is a separate
 # stack from the V1 files in the folder above, because a gateway sends session setup to one
 # bastion address per route, so a gateway serves the V1 bastion or the V2 one and not both.

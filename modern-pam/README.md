@@ -1,4 +1,4 @@
-# Modern PAM (SRA V2) with an Akeyless Gateway
+# Modern PAM with an Akeyless Gateway
 
 An example Docker Compose for evaluating Modern PAM on one host: the Akeyless Gateway, the Modern PAM
 bastion (SSH, browser SSH, database and remote desktop sessions) and the remote desktop engine.
