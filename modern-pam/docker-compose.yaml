@@ -4,12 +4,15 @@
 # bastion address per route, so a gateway serves the V1 bastion or the V2 one and not both.
 # Do not run it beside the V1 stack on the same gateway.
 #
-#   MODERN_PAM_VERSION=<published tag> docker compose up -d
+#   docker compose up -d
+#
+# The gateway and Modern PAM tags below are pinned, and GATEWAY_VERSION and MODERN_PAM_VERSION override them.
+# Bastion registration needs gateway 5.8.0 or later.
 name: modern-pam
 
 services:
   akeyless-gateway:
-    image: akeyless/gateway:${GATEWAY_VERSION:-latest}
+    image: akeyless/gateway:${GATEWAY_VERSION:-5.8.0}
     container_name: akeyless-gateway
     restart: unless-stopped
     env_file:
@@ -25,7 +28,7 @@ services:
     networks: [modern-pam]
 
   modern-pam:
-    image: akeyless/modern-pam:${MODERN_PAM_VERSION:?set MODERN_PAM_VERSION to a published akeyless/modern-pam tag}
+    image: akeyless/modern-pam:${MODERN_PAM_VERSION:-0.9.1}
     container_name: modern-pam
     restart: unless-stopped
     env_file:

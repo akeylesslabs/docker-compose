@@ -28,8 +28,9 @@ route, so a gateway serves the V1 bastion or the Modern PAM one and not both. Do
    range in `/etc/subuid` plus 65531, so use that UID in the `chown`.
    If the bastion log says it cannot read the host key, check the file's owner.
 3. Put your targets' host keys in `./known_hosts`, one line each. A target that is not listed is refused.
-4. Start it with a published `akeyless/modern-pam` tag:
-   `MODERN_PAM_VERSION=<tag> docker compose up -d`
+4. Start it. It runs the pinned `akeyless/modern-pam` 0.9.1 and `akeyless/gateway` 5.8.0 images:
+   `docker compose up -d`
+   To try another published `akeyless/modern-pam` tag, set it: `MODERN_PAM_VERSION=<tag> docker compose up -d`.
 
 The bastion starts after the gateway reports healthy. If you start the services yourself in another order, the
 bastion restarts until the gateway answers, which is harmless.
@@ -45,5 +46,5 @@ bastion restarts until the gateway answers, which is harmless.
 ## Notes
 
 - The first connection from a client asks about the bastion's host key. It does not change while `./hostkey` stays.
-- `GATEWAY_VERSION` selects the gateway image tag, `latest` by default.
+- `GATEWAY_VERSION` selects the gateway image tag, 5.8.0 by default. `MODERN_PAM_VERSION` selects the bastion image tag, 0.9.1 by default.
 - Moving from the V1 stack: see the migration guide of the Modern PAM documentation, and stop the V1 stack first.
